@@ -25,7 +25,7 @@ def arxivPaper(url):
 
     f = urllib.urlopen(url)
     html = f.read()
-   
+
     #HACK: seems the ending tag is broken as of right now - just grab the header, all info there anyway
     #there has to be a prettier way to do this!
     html=html[0:html.find("</head>")]+"</head>\n</html>"
@@ -110,4 +110,8 @@ if __name__=="__main__":
             print("Already exist in db... %s\n" % url)
             
     
+
+
+
+
 

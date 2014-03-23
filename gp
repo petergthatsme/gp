@@ -1,5 +1,11 @@
 #!/usr/bin/python
 
+#This program will grab paper from arxiv.org given a url to the main paper page. It will parse the page
+#to grab the paper's title, and the author's names and create an appropriate file name.
+
+#It is meant to simplify this process, but it should not be abused, as I am not sure how keen
+#arxiv.org is on having people grab papers via automated means. 
+
 import unicodedata 
 import urllib
 import shutil
@@ -18,7 +24,7 @@ version = '%prog 0.1'
 
 parser = OptionParser(usage=usage, version=version)
 parser.add_option("-r", "--rebuild", action='store',
-                  help="write report to FILE", metavar="FILE")
+                  help="Redownloads all the publications from the database file", metavar="FILE")
 opts, args = parser.parse_args()
 
 def arxivPaper(url):

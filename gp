@@ -1,10 +1,15 @@
 #!/usr/bin/python
 
+#author: peter g
+
 #This program will grab paper from arxiv.org given a url to the main paper page. It will parse the page
 #to grab the paper's title, and the author's names and create an appropriate file name.
-
 #It is meant to simplify this process, but it should not be abused, as I am not sure how keen
 #arxiv.org is on having people grab papers via automated means. 
+
+
+#TODO:
+#shorten author names in a nice way when file names end up being too long
 
 import unicodedata 
 import urllib
@@ -17,7 +22,7 @@ from os.path import expanduser
 from os.path import exists
 from os.path import join
 
-baseDir=join(expanduser("~") ,"spideroak/docs/")
+baseDir=join(expanduser("~") ,"Dropbox/papers_and_docs/")
 
 usage = '%prog [options] url1 url2 ...'
 version = '%prog 0.1'
@@ -25,6 +30,8 @@ version = '%prog 0.1'
 parser = OptionParser(usage=usage, version=version)
 parser.add_option("-r", "--rebuild", action='store',
                   help="Redownloads all the publications from the database file", metavar="FILE")
+parser.add_option("-o", "--overwrite", action='store_true',
+                  help="Re-download paper even if already present in database.")
 opts, args = parser.parse_args()
 
 def arxivPaper(url):
@@ -35,6 +42,9 @@ def arxivPaper(url):
     #HACK: seems the ending tag is broken as of right now - just grab the header, all info there anyway
     #there has to be a prettier way to do this!
     html=html[0:html.find("</head>")]+"</head>\n</html>"
+    #broken as of Aug 4, 2016
+    html=html.replace(r'<meta name="viewport" content="width=device-width, initial-scale=1">', '')
+    html=html.replace(r'<meta http-equiv="X-UA-Compatible" content="IE=edge">', '')
 
     xmldoc = minidom.parseString(html)
     metaList=xmldoc.getElementsByTagName('meta')
@@ -100,7 +110,9 @@ if __name__=="__main__":
         urls=args
 
     for url in urls:
-        if not isInFile(url, dbFileName):
+        isInDatabase=isInFile(url, dbFileName)
+
+        if not isInDatabase or opts.overwrite:
 
             if "arxiv.org" in url:
                 fileName=arxivPaper(url)
@@ -110,14 +122,11 @@ if __name__=="__main__":
                 print("Don't know how to get paper from '%s'" % url)
                 continue
 
-            print("Adding '%s' to %s" % (url, dbFileName))
-            file(dbFileName, 'a').write("%s %s\n" % (url, fileName))
+            if not isInDatabase:
+                print("Adding '%s' to %s" % (url, dbFileName))
+                file(dbFileName, 'a').write("%s %s\n" % (url, fileName))
         else:
-            print("Already exist in db... %s\n" % url)
-            
-    
-
-
-
+            print("Paper laready exist in database: %s\n" % url)
+           
 
 
